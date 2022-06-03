@@ -1,4 +1,5 @@
 import { GetStaticProps } from "next";
+import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 
 type IProps = {
@@ -42,11 +43,35 @@ export async function getStaticPaths() {
   };
 }
 
+type IRes = {
+  revalidated?: boolean;
+  message?: string;
+};
+
 export default function Article({ data, article }: IProps & Params) {
+  const router = useRouter();
+
+  const handleRevalidate = async () => {
+    const res: IRes = await fetch(
+      `/api/revalidate${router.asPath}?secret=${process.env.NEXT_PUBLIC_SECRET_TOKEN}`
+    ).then((res) => res.json());
+
+    if (res.revalidated) {
+      alert("Revalidated");
+      router.reload();
+      return;
+    }
+
+    alert(res.message);
+  };
+
   return (
     <div>
       <p>{article}</p>
       <p>{data.date}</p>
+      <a onClick={handleRevalidate} style={{ cursor: "pointer" }}>
+        <p>Revalidate</p>
+      </a>
     </div>
   );
 }
