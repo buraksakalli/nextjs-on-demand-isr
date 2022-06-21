@@ -39,7 +39,7 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: false,
+    fallback: false, // if you generate another page in the feature, you need to pass true
   };
 }
 
